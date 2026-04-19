@@ -31,7 +31,7 @@ class KNN(object):
 
         pred_labels = []
 
-        self.training_labels
+        self.training_labels = training_labels
         self.means = training_data.mean(0,keepdims=True)
         self.stds  = training_data.std(0,keepdims=True)
 
@@ -42,11 +42,15 @@ class KNN(object):
             diff = self.normalized_space - point
             squared = diff ** 2
             distances = np.sqrt(np.sum(squared, axis=1))
-            distances[i] = np.inf
             indices = np.argsort(distances)[:self.k]
-            k_nearest_neighbour = training_labels[indices]
-            most_common_label = np.argmax(np.bincount(k_nearest_neighbour))
-            pred_labels.append(most_common_label)
+            k_nearest_neighbour = self.training_labels[indices]
+            
+            if self.task_kind == "classification":
+                prediction = np.argmax(np.bincount(k_nearest_neighbour.astype(int)))
+            else:
+                prediction = np.mean(k_nearest_neighbour)
+                
+            pred_labels.append(prediction)
             # add weights possibly
 
         pred_labels = np.array(pred_labels)
@@ -71,17 +75,13 @@ class KNN(object):
             squared = diff**2
             distances = np.sqrt(np.sum(squared, axis=1))
             indices = np.argsort(distances)[:self.k]
-
-            
             k_nearest_neighbour = self.training_labels[indices]
-            most_common_label = np.argmax(np.bincount(k_nearest_neighbour))
-            test_labels.append(most_common_label)
+            
+            if self.task_kind == "classification":
+                prediction = np.argmax(np.bincount(k_nearest_neighbour.astype(int)))
+            else:
+                prediction = np.mean(k_nearest_neighbour)
 
-            ## question here for tmrw
-            ## it is asked in pdf that knn should support regression and classification
-            ## here i've implemented classficiation
-            ## for regression we look at k nearest neighbours then take their mean
-            ## but this is taken from train_labels_reg which is not provided here 
-            ## depends on task_kind, should i still implement it, or it's hard coded ?
+            test_labels.append(prediction)
         test_labels = np.array(test_labels)
         return test_labels
