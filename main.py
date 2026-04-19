@@ -1,5 +1,6 @@
 import argparse
 import numpy as np
+import time
 
 from src.methods.dummy_methods import DummyClassifier
 from src.methods.logistic_regression import LogisticRegression
@@ -38,10 +39,24 @@ def main(args):
 
     # Make a validation set (it can overwrite xtest, ytest)
     if not args.test:
-        ### WRITE YOUR CODE HERE
-        pass
+        val_size = int(0.2 * train_features.shape[0])
+        # simple split 80-20
+        test_features = train_features[-val_size:]
+        test_labels_reg = train_labels_reg[-val_size:]
+        test_labels_classif = train_labels_classif[-val_size:]
+        
+        train_features = train_features[:-val_size]
+        train_labels_reg = train_labels_reg[:-val_size]
+        train_labels_classif = train_labels_classif[:-val_size]
+        print(f"Validation mode active: Train on {train_features.shape[0]} samples, Validate on {test_features.shape[0]} samples")
 
-    ### WRITE YOUR CODE HERE to do any other data processing
+    # Normalize data (only if not using KNN since KNN does it internally)
+    if args.method != "knn":
+        means = np.mean(train_features, axis=0, keepdims=True)
+        stds = np.std(train_features, axis=0, keepdims=True)
+        stds[stds == 0] = 1.0  # prevent division by zero
+        train_features = normalize_fn(train_features, means, stds)
+        test_features = normalize_fn(test_features, means, stds)
 
     ## 3. Initialize the method you want to use.
 
@@ -50,16 +65,13 @@ def main(args):
         method_obj = DummyClassifier(arg1=1, arg2=2)
 
     elif args.method == "knn":
-        ### WRITE YOUR CODE HERE
-        pass
+        method_obj = KNN(k=args.K, task_kind=args.task)
 
     elif args.method == "logistic_regression":
-        ### WRITE YOUR CODE HERE
-        pass
+        method_obj = LogisticRegression(lr=args.lr, max_iters=args.max_iters)
 
     elif args.method == "linear_regression":
-        ### WRITE YOUR CODE HERE
-        pass
+        method_obj = LinearRegression()
 
     else:
         raise ValueError(f"Unknown method: {args.method}")
@@ -69,10 +81,14 @@ def main(args):
     if args.task == "classification":
         assert args.method != "linear_regression", f"You should use linear regression as a regression method"
         # Fit the method on training data
+        t0 = time.time()
         preds_train = method_obj.fit(train_features, train_labels_classif)
+        t1 = time.time()
 
         # Predict on unseen data
+        t2 = time.time()
         preds = method_obj.predict(test_features)
+        t3 = time.time()
 
         # Report results: performance on train and valid/test sets
         acc = accuracy_fn(preds_train, train_labels_classif)
@@ -82,14 +98,20 @@ def main(args):
         acc = accuracy_fn(preds, test_labels_classif)
         macrof1 = macrof1_fn(preds, test_labels_classif)
         print(f"Test set:  accuracy = {acc:.3f}% - F1-score = {macrof1:.6f}")
+        
+        print(f"\nRuntime: Training took {t1-t0:.4f}s | Prediction took {t3-t2:.4f}s")
 
     elif args.task == "regression":
         assert args.method != "logistic_regression", f"You should use logistic regression as a classification method"
         # Fit the method on training data
+        t0 = time.time()
         preds_train = method_obj.fit(train_features, train_labels_reg)
+        t1 = time.time()
 
         # Predict on unseen data
+        t2 = time.time()
         preds = method_obj.predict(test_features)
+        t3 = time.time()
 
         # Report results: MSE on train and valid/test sets
         train_mse = mse_fn(preds_train, train_labels_reg)
@@ -97,6 +119,8 @@ def main(args):
 
         test_mse = mse_fn(preds, test_labels_reg)
         print(f"Test set:  MSE = {test_mse:.6f}")
+        
+        print(f"\nRuntime: Training took {t1-t0:.4f}s | Prediction took {t3-t2:.4f}s")
 
     else:
         raise ValueError(f"Unknown task: {args.task}")
