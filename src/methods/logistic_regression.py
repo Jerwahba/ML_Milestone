@@ -65,7 +65,8 @@ class LogisticRegression(object):
 
             self.weights -= self.lr * gradient
 
-        return self.predict(training_data)
+        pred_labels = self.predict(training_data)
+        return pred_labels
 
     def predict(self, test_data):
         """
