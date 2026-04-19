@@ -1,4 +1,5 @@
 import numpy as np
+from src.utils import append_bias_term
 
 
 class LinearRegression(object):
@@ -11,6 +12,7 @@ class LinearRegression(object):
         Initialize the new object (see dummy_methods.py)
         and set its arguments.
         """
+        self.weights = None
 
     def fit(self, training_data, training_labels):
         """
@@ -30,6 +32,16 @@ class LinearRegression(object):
         #### WRITE YOUR CODE HERE!
         ###
         ##
+        # Add bias term
+        X = append_bias_term(training_data)
+        
+        # Closed-form solution: w = (X^T * X)^{-1} * X^T * y
+        # We use np.linalg.pinv for numerical stability
+        self.weights = np.linalg.pinv(X.T @ X) @ X.T @ training_labels
+        
+        # Predictions for the training data
+        pred_labels = X @ self.weights
+        
         return pred_labels
 
     def predict(self, test_data):
@@ -46,4 +58,10 @@ class LinearRegression(object):
         #### WRITE YOUR CODE HERE!
         ###
         ##
+        # Add bias term
+        X = append_bias_term(test_data)
+        
+        # Predict using the learned weights
+        pred_labels = X @ self.weights
+        
         return pred_labels
