@@ -1,0 +1,58 @@
+# Virtual environment
+venv/
+.venv/
+env/
+.env/
+
+# Datasets & large data files
+data/
+*.npz
+*.npy
+*.csv
+*.tsv
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+*.parquet
+*.feather
+*.json.gz
+
+# Model checkpoints & outputs
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+results/
+outputs/
+checkpoints/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs & misc
+*.log
+*.tmp
+*.zip
