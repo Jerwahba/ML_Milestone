@@ -175,19 +175,19 @@ if __name__ == "__main__":
     parser.add_argument(
         "--K",
         type=int,
-        default=1,
+        default=20,
         help="number of clusters datapoints used for kmeans",
     )
     parser.add_argument(
         "--lr",
         type=float,
-        default=1e-5,
+        default=3e-3,
         help="learning rate for methods with learning rate",
     )
     parser.add_argument(
         "--max_iters",
         type=int,
-        default=100,
+        default=300,
         help="max iters for methods which are iterative",
     )
     parser.add_argument(
