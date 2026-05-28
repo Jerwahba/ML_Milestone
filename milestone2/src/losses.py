@@ -31,4 +31,3 @@ class CrossEntropy:
         eps = 1e-15
         y_pred_clipped = np.clip(y_pred, eps, 1.0 - eps)
         return -(y_true / y_pred_clipped) / y_true.shape[0]
-

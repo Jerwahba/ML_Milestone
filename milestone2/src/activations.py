@@ -29,4 +29,3 @@ class Identity:
     @staticmethod
     def gradient(z):
         return np.ones_like(z)
-
